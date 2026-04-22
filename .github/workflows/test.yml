@@ -1,0 +1,29 @@
+name: Smoke Test Modules
+on: [push, pull_request]
+jobs:
+  test:
+    name: ${{ matrix.module }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: windows-latest
+            module: x86_64-win32
+          - os: ubuntu-latest
+            module: x86_64-linux-gnu
+          - os: ubuntu-24.04-arm
+            module: aarch64-linux-gnu
+          - os: macos-26-intel
+            module: x86_64-macos
+          - os: macos-latest
+            module: arm64-macos
+    defaults:
+      run:
+        working-directory: ${{ matrix.module }}
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-go@v6
+        with:
+          go-version: "1.26"
+      - run: go test -tags smoketest
